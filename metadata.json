@@ -1,0 +1,8 @@
+{
+  "name": "Remix: AI Patch Validator",
+  "description": "Professional security analysis tool for vulnerability detection and patch validation using controlled generative AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
