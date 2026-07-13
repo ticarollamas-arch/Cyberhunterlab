@@ -1,6 +1,7 @@
 # 👑 Bancada Prompt & AI Patch Validator: Orquestrador de Engenharia e Blindagem de Instruções Sênior
 
-> **Enterprise-Grade Vulnerability Remediation and Automated Patch Validation Engine**  
+> **Enterprise-Grade Vulnerability Remediation and
+> Automated Patch Validation Engine**  
 > *Uma suíte de engenharia de segurança de alta fidelidade e governança de contexto para auditorias de código e proteção contra bypasses lógicos (P0/P1/P2) sob diretrizes regulatórias Google VRP e HackerOne.*
 
 ---
