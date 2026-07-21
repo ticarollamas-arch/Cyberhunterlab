@@ -5,7 +5,7 @@ import { useApiKey } from '../lib/apiKey';
 import { cn } from '../lib/utils';
 
 export function ApiKeySetup({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { apiKey, setApiKey, isConfigured } = useApiKey();
+  const { apiKey, setApiKey, isConfigured, selectedModel, setSelectedModel } = useApiKey();
   const [inputValue, setInputValue] = useState(apiKey || '');
   const [showKey, setShowKey] = useState(false);
 
@@ -96,6 +96,25 @@ export function ApiKeySetup({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                       {showKey ? <Key size={14} /> : <Key size={14} className="opacity-50" />}
                     </button>
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
+                    Modelo de Inteligência Artificial
+                  </label>
+                  <select
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value as any)}
+                    className="w-full bg-[#0d0d0d] border border-zinc-800 rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-zinc-500 transition-all hover:border-zinc-700"
+                  >
+                    <option value="gemini-flash-latest">gemini-flash-latest (Mais Estável & Compatível - BYOK)</option>
+                    <option value="gemini-3.5-flash">gemini-3.5-flash (Alta Velocidade - Preview)</option>
+                    <option value="gemini-2.5-flash">gemini-2.5-flash (Estável / Padrão)</option>
+                    <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview (Raciocínio Avançado - BYOK Pago)</option>
+                  </select>
+                  <p className="text-[9px] font-mono text-zinc-500 leading-normal">
+                    Nota: Se você receber o erro <span className="text-red-400 font-bold">403 (Permission Denied)</span>, use o modelo <span className="text-emerald-400 font-bold">gemini-flash-latest</span> que possui total compatibilidade pública.
+                  </p>
                 </div>
 
                 {!isConfigured && !inputValue && (

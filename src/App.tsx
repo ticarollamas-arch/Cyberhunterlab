@@ -54,7 +54,7 @@ function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('vrp_auth') === 'true';
   });
-  const { apiKey, isConfigured } = useApiKey();
+  const { apiKey, isConfigured, selectedModel } = useApiKey();
   const [showApiKeySetup, setShowApiKeySetup] = useState(false);
   const [view, setView] = useState<'validator' | 'resources' | 'pipeline' | 'osv' | 'vrp-scope' | 'reverse-arch' | 'cwe22-academy' | 'report-generator'>(() => {
     return (localStorage.getItem('validator_view') as any) || 'validator';
@@ -207,8 +207,15 @@ function AppContent() {
         setView(customEvent.detail);
       }
     };
+    const handleOpenApiKeySetup = () => {
+      setShowApiKeySetup(true);
+    };
     window.addEventListener('switch-view', handleSwitch);
-    return () => window.removeEventListener('switch-view', handleSwitch);
+    window.addEventListener('open-api-key-setup', handleOpenApiKeySetup);
+    return () => {
+      window.removeEventListener('switch-view', handleSwitch);
+      window.removeEventListener('open-api-key-setup', handleOpenApiKeySetup);
+    };
   }, []);
 
   useEffect(() => {
@@ -324,7 +331,8 @@ function AppContent() {
         history.map(h => h.result),
         targetPlatform,
         apiKey,
-        safeMode
+        safeMode,
+        selectedModel
       );
       
       const session: SecurityAnalysis = {

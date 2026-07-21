@@ -90,7 +90,8 @@ export const analyzePatch = async (
   history: AnalysisResult[] = [],
   platform: 'google_vrp' | 'hackerone' = 'google_vrp',
   userApiKey?: string | null,
-  safeMode: boolean = true
+  safeMode: boolean = true,
+  userModel?: string
 ): Promise<{ analysis: AnalysisResult; verification: VerificationResult | undefined }> => {
   const apiKey = userApiKey || process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -105,20 +106,30 @@ export const analyzePatch = async (
     }
   });
   
-  // High-performance retry logic
+  // High-performance retry logic with automatic model fallback for 403 PERMISSION_DENIED
   const generateWithRetry = async (model: string, contents: any, config: any, maxRetries = 2) => {
     let lastError: any;
+    let currentModel = model;
     for (let i = 0; i < maxRetries; i++) {
       try {
         const response = await ai.models.generateContent({
-          model,
+          model: currentModel,
           contents,
           config
         });
         return response;
       } catch (error: any) {
         lastError = error;
+        console.warn(`Gemini Request failed for model ${currentModel}:`, error);
+
+        const isPermissionDenied = error.message?.includes("403") || error.message?.includes("permission") || error.message?.includes("PERMISSION_DENIED");
         const isRateLimit = error.message?.includes("429") || error.message?.includes("Resource has been exhausted");
+
+        if (isPermissionDenied && currentModel !== 'gemini-flash-latest') {
+          console.log(`Automatic Fallback: 403 Permission Denied on ${currentModel}. Retrying with gemini-flash-latest...`);
+          currentModel = 'gemini-flash-latest';
+          continue; // retry immediately with the fallback model
+        }
         
         if (isRateLimit && i < maxRetries - 1) {
           const delay = 1000 * (i + 1); 
@@ -143,8 +154,8 @@ export const analyzePatch = async (
   
   // Otimização de Velocidade: 
   // Forçamos modelos Flash para máxima velocidade a menos que o usuário peça explicitamente o Pro.
-  const modelName = useThinking ? "gemini-3.1-pro-preview" : "gemini-3.5-flash";
-  const verificationModel = "gemini-3.5-flash"; // Sempre flash para verificação ser rápida
+  const modelName = userModel || (useThinking ? "gemini-3.1-pro-preview" : "gemini-3.5-flash");
+  const verificationModel = "gemini-flash-latest"; // Sempre flash estável para verificação ser rápida e compatível
 
   const historySummary = history.length > 0 
     ? `HISTÓRICO DE VULNERABILIDADES JÁ ENCONTRADAS (Para verificar Dulplicata):\n${history.map(h => `- ${h.vulnerabilidade} (${h.tipo})`).join('\n')}`

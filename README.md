@@ -1,173 +1,155 @@
-# 👑 Bancada Prompt & AI Patch Validator: Orquestrador de Engenharia e Blindagem de Instruções Sênior
+# 👑 GitHub Project Forge AI
+## Enterprise AI Application Generator & Open Source Repository Builder
 
-> **Enterprise-Grade Vulnerability Remediation and
-> Automated Patch Validation Engine**  
-> *Uma suíte de engenharia de segurança de alta fidelidade e governança de contexto para auditorias de código e proteção contra bypasses lógicos (P0/P1/P2) sob diretrizes regulatórias Google VRP e HackerOne.*
-
----
-
-## ⚡ Links Rápidos de Acesso e Demonstração
-
-*   **🌐 [Demonstração ao Vivo (Production Preview)](https://ais-pre-k6yccizdgwocdze7c3pa4s-13767980963.us-west2.run.app)**: Instância ativa executando o barramento do portal e a interface corporativa de análise de segurança.
-*   **⚡ [Remixar no Google AI Studio](https://ai.studio/build/00e287f6-a979-4348-b38c-551fe3514ad6)**: Clone o espaço de trabalho completo em sua conta para auditar os motores de IA e provisionar sua própria infraestrutura em containers.
-
----
-
-## 🏗️ Visão Geral e Arquitetura do Sistema
-
-O **AI Patch Validator** (Bancada Prompt) é uma plataforma de segurança projetada sob o paradigma **Zero Trust** para automatizar a triagem, análise e validação de patches de código-fonte. O sistema substitui validações manuais de risco por um pipeline determinístico que detecta falhas de lógica de negócios em fluxo de dados (*Source-to-Sink*), valida limites de privilégios de containers e mitiga desvios de integridade na nuvem.
-
-### Pipeline de Orquestração Cognitiva (Data-Flow)
-
-```
-                                      [CÓDIGO DE ORIGEM / DIFF PATCH]
-                                                     │
-                                                     ▼
-                                     [VALIDAÇÃO DE CONTRATOS (ZOD)]
-                                                     │
-                                                     ▼
-                                    [ENGINE DE HISTÓRICO LOCAL (DEDUPE)]
-                                                     │
-                                                     ▼
-                                   [ORCHESTRATOR COGNITIVE SANDBOX]
-                                                     │
-                    ┌────────────────────────────────┴────────────────────────────────┐
-                    ▼                                                                 ▼
-         [PIPELINE HIGH-SPEED (Flash)]                                   [PIPELINE REASONING (Pro)]
-                    │                                                                 │
-                    ▼                                                                 ▼
-       [TRIAGEM RÁPIDA DE IMPACTO SRE]                                  [AUDITORIA MULTI-AGENTE (Dual)]
-                    │                                                                 │
-                    └────────────────────────────────┬────────────────────────────────┘
-                                                     ▼
-                                         [CIRCUIT BREAKER CONTROL]
-                                                     │
-                                                     ▼
-                                       [WINSTON OBSERVABILITY SRE LOGS]
+```text
+ ██████╗ ██╗████████╗██╗  ██╗██╗   ██╗██████╗     ██████╗ ██████╗  ██████╗      ██████╗███████╗ ██████╗████████╗
+██╔════╝ ██║╚══██╔══╝██║  ██║██║   ██║██╔══██╗    ██╔══██╗██╔══██╗██╔═══██╗    ██╔════╝██╔════╝██╔════╝╚══██╔══╝
+██║  ███╗██║   ██║   ███████║██║   ██║██████╔╝    ██████╔╝██████╔╝██║   ██║    ██║     █████╗  ██║        ██║   
+██║   ██║██║   ██║   ██╔══██║██║   ██║██╔══██╗    ██╔═══╝ ██╔══██╗██║   ██║    ██║     ██╔══╝  ██║        ██║   
+╚██████╔╝██║   ██║   ██║  ██║╚██████╔╝██████╔╝    ██║     ██║  ██║╚██████╔╝    ╚██████╗███████╗╚██████╗   ██║   
+ ╚═════╝ ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝     ╚═╝     ╚═╝  ╚═╝ ╚══════╝     ╚═════╝╚══════╝ ╚═════╝   ╚═╝   
+                                                                                                            
+                         ███████╗ ██████╗ ██████╗  ██████╗ ███████╗                                         
+                         ██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝                                         
+                         █████╗  ██║   ██║██████╔╝██║  ███╗█████╗                                           
+                         ██╔══╝  ██║   ██║██╔══██╗██║   ██║██╔══╝                                           
+                         ██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗                                         
+                         ╚═╝      ╚═════╝ ╚═╝  ╚═╝ ╚══════╝╚══════╝                                         
 ```
 
----
-
-## 🛡️ Alinhamento: AWS Well-Architected Framework
-
-Como arquiteto de soluções, esta aplicação foi desenhada respeitando rigorosamente os pilares de arquitetura de nuvem empresarial da **AWS Well-Architected Framework**:
-
-### 1. Segurança (Security-by-Design & Zero Trust)
-*   **Isolamento de Contexto (Cognitive Sandboxing)**: Restringe o escopo de interpretação do LLM estritamente às diretrizes de segurança de código fornecidas, usando metaprompting estruturado que rejeita instruções ofensivas e alucinações semânticas.
-*   **Validação de Fronteiras de Confiança**: O motor analisa o impacto do patch em 6 dimensões de segurança:
-    1.  *Filesystem Boundary* (Fronteira de arquivos, ex: CWE-22, path traversals).
-    2.  *Identity Boundary* (Fronteira de identidade/tokens).
-    3.  *Namespace Boundary* (Fronteira de orquestração de containers).
-    4.  *Tenant Boundary* (Vazamento cross-account em multi-tenancy).
-    5.  *Network Boundary* (Exposição de portas internas/SSRF).
-    6.  *Service Trust Boundary* (Quebra de handshakes entre microsserviços).
-
-### 2. Confiabilidade (Reliability & Fault Tolerance)
-*   **Circuit Breaker & Retry Automático**: Implementação resiliente na comunicação com as APIs de IA externa. Se o serviço retornar limitação de taxa (HTTP 429 / *Resource Exhausted*), o sistema intercepta o erro através de um fluxo inteligente com **Backoff Exponencial** e recuo defensivo.
-*   **Idempotência e Sanitização de Entrada**: Garante que o mesmo payload não sobrecarregue o modelo, validando o schema de saída estruturado em nível de engine.
-
-### 3. Eficiência de Performance (Performance Efficiency)
-*   **Estratégia de Model Split (Multi-Agent Cascade)**:
-    *   **Gemini 3.5 Flash** é utilizado para triagem instantânea de menor latência (pipeline padrão, economia drástica de tokens e tempo de processamento).
-    *   **Gemini 3.1 Pro com Reasoning Engine** é acionado sob demanda apenas quando há necessidade de verificação formal profunda contra falsos positivos.
-
-### 4. Excelência Operacional (Operational Excellence)
-*   **Telemetria SRE Embutida**: Cada análise gera métricas de latência em milissegundos, taxa de processamento de tokens e metadados sobre o pipeline utilizado.
-*   **Logs Estruturados para CloudWatch/Datadog**: Emissão de logs padronizados via Winston para garantir indexação direta e observabilidade de auditoria de segurança.
-
-### 5. Otimização de Custos (Cost Optimization)
-*   **Mecanismo de Deduplicação Local**: O histórico de análises é verificado localmente antes do envio do payload para o provedor de IA, evitando chamadas repetidas de API para o mesmo Diff de código e otimizando o gasto operacional da infraestrutura.
+> **Enterprise-Grade Vulnerability Remediation, Automated Repository Bootstrapping, and Secure Code Engineering Platform.**  
+> *Uma suíte arquitetada sob os pilares SOLID, Clean Architecture e Práticas de Segurança Sênior para empacotar, validar e auditar aplicações com barramentos cognitivos e pipeline DevSecOps.*
 
 ---
 
-## 🛠️ Stack Tecnológica de Alta Performance
+## ⚡ Guia de Inicialização Rápida (Clone & Setup)
 
-*   **Runtime & Linguagem**: Node.js, TypeScript Estrito (CI/CD Compilado).
-*   **Vite & React 19 SPA**: Interface de alto contraste projetada para analistas de segurança, livre de dependências redundantes e otimizada para renderização acelerada.
-*   **Tailwind CSS v4**: Utilização de variáveis globais e tokens de design modernos diretamente compilados pelo compilador `@tailwindcss/vite`.
-*   **Segurança Estática**: `javascript-obfuscator` nativo no pipeline de build do Vite para proteger a lógica proprietária do motor do analista de ataques reversos diretos no browser.
+Selecione um dos métodos abaixo para clonar, remixar ou rodar a aplicação instantaneamente em seu ambiente de desenvolvimento local ou em containers:
+
+### 1. Clonar o Repositório Oficial (Git CLI)
+```bash
+# Clone o repositório
+git clone https://github.com/ana-caroline-lamas/bancada-prompt.git
+
+# Acesse o diretório do projeto
+cd bancada-prompt
+
+# Instale as dependências com integridade garantida
+npm install
+```
+
+### 2. Remixagem Inteligente e Sandbox Isolado
+Caso deseje clonar e rodar o espaço de desenvolvimento de forma rápida com uma arquitetura pronta, você pode estender este projeto sem marcas d'água externas. Use nossa estrutura desacoplada para portar o motor completo para qualquer nuvem (AWS/GCP) ou orquestrador local.
 
 ---
 
-## 🧩 Módulos do Sistema e Capacidades
+## 🏗️ Visão Geral & Arquitetura de Software
 
-O painel central expõe uma suíte especializada que reflete todas as frentes de uma infraestrutura robusta de SecOps:
+Esta plataforma foi desenvolvida utilizando padrões modernos de **Engenharia de Software Corporativa**. A separação de responsabilidades assegura que as regras de domínio permaneçam isoladas de detalhes de implementação de terceiros (como bibliotecas de UI e adaptadores de IA).
 
-1.  **AI Patch Validator (Dual-Patch Analyzer)**: Entrada de códigos "Antes" e "Depois" para provar e auditar se a remediação inserida realmente remove o bug lógico ou se há riscos de regressão operacional.
-2.  **DevSecOps Agentic Pipeline**: Interface de simulação de pipelines integrados que avaliam branches de código em tempo de Pull Request.
-3.  **OSV Schema Module**: Conversor e validador de vulnerabilidades baseado no formato global de código aberto OSV (Open Source Vulnerability).
-4.  **Reverse Architecture Engine**: Mapeador estático de software que projeta os fluxos e dependências estruturais de pacotes legados para documentação executiva.
-5.  **CWE-22 Academy (Interactive Lab)**: Um ambiente de treinamento ativo contendo cenários de vulnerabilidade realistas (Python/Flask e Python CLI) focados em caminhos de arquivos relativos e sanitização rigorosa de inputs de SRE.
+### Camadas da Clean Architecture Integrada
+
+```
+                 ┌─────────────────────────────────────────────────────────┐
+                 │                  1. CAMADA DE INTERFACE                 │
+                 │     (React 19 SPA, Tailwind v4, Componentes Modulares)  │
+                 └────────────────────────────┬────────────────────────────┘
+                                              │ (Ações do Usuário & State)
+                                              ▼
+                 ┌─────────────────────────────────────────────────────────┐
+                 │                 2. SERVIÇOS & ADAPTADORES               │
+                 │     (Orquestradores de LLM, Sanitizadores de Input)     │
+                 └────────────────────────────┬────────────────────────────┘
+                                              │ (Tipagem Estrita)
+                                              ▼
+                 ┌─────────────────────────────────────────────────────────┐
+                 │                 3. NÚCLEO DE DOMÍNIO (TYPES)            │
+                 │     (Esquemas Zod, Definições de Modelos e Entidades)   │
+                 └─────────────────────────────────────────────────────────┘
+```
+
+- **Enterprise App Generator (`/src/components`)**: Suítes altamente desacopladas que modularizam as visões de auditoria, simuladores de CI/CD e laboratórios interativos.
+- **Cognitive Engines (`/src/services/gemini.ts`)**: Implementação de barramento sênior resiliente com suporte a múltiplos modelos em cascata, controle de circuit-breaker integrado, tratamento automático de erros de permissão (`403 PERMISSION_DENIED`) com fallback determinístico para `gemini-flash-latest` e mecanismo de retry inteligente contra limites de taxa (`429`).
+- **Domain Model (`/src/types.ts`)**: Tipagem estrita que governa as fronteiras de dados sem dependência de dependências runtime externas.
 
 ---
 
-## 📊 Telemetria de Produção e Exemplo de Log SRE
+## 🛡️ Alinhamento AWS Well-Architected & DevSecOps
 
-Os eventos de análise gerados pela bancada são injetados no barramento de observabilidade no formato JSON estruturado abaixo, permitindo criação de alertas de anomalia no AWS CloudWatch:
+O projeto incorpora os mais rigorosos preceitos de qualidade de código e segurança corporativa:
 
-```json
-{
-  "timestamp": "2026-07-12T17:06:05Z",
-  "transaction_id": "TX_88A3B91C4",
-  "level": "INFO",
-  "service": "prompt-bench-orchestrator",
-  "action": "PATCH_SECURITY_ANALYSIS",
-  "metrics": {
-    "latency_ms": 1420,
-    "throughput_tokens_sec": 74.5,
-    "model_utilized": "gemini-3.5-flash",
-    "pipeline": "High-Speed Triage Scanner"
-  },
-  "security_verdict": {
-    "vulnerabilidade": "Path Traversal Arbitrary File Write",
-    "severidade": "CRITICAL",
-    "cwe_id": "CWE-22",
-    "patch_correct": true,
-    "confianca": 0.98,
-    "status": "confirmado"
+### 1. Segurança e Governança (Security-by-Design)
+- **Zero-Trust Input Validation**: Garantias de validação estática de dados e tratamento de erros de execução de modelos cognitivos antes da persistência em cache.
+- **Logical Sandbox Defenses**: Mitigações integradas para avaliar falhas complexas como **CWE-22 (Path Traversal)**, vazamentos cross-tenant e integridade de microsserviços.
+
+### 2. Confiabilidade & Observabilidade SRE
+- **Mecanismo de Circuit Breaker**: Proteção contra falhas transitórias e rate limiting nas requisições do motor cognitivo através de recuos exponenciais de tempo (*exponential backoff*).
+- **Barramento de Log Estruturado**: Métricas de análise padronizadas em formato JSON otimizado para agregadores de telemetria como CloudWatch, AWS Athena e Datadog:
+  ```json
+  {
+    "timestamp": "2026-07-21T13:00:00Z",
+    "level": "INFO",
+    "service": "project-forge-orchestrator",
+    "metrics": {
+      "latency_ms": 1150,
+      "model_utilized": "gemini-flash-latest",
+      "pipeline": "Automated Code Analysis Pipeline"
+    },
+    "verdict": {
+      "status": "APPROVED",
+      "remediation_applied": true
+    }
   }
-}
+  ```
+
+---
+
+## 🛠️ Stack Tecnológica Enterprise
+
+- **Core & Runtime**: Node.js, TypeScript 5.x (estrito e tipado).
+- **Frontend SPA**: React 19, Vite (com exclusão nativa de redundâncias), Tailwind CSS v4 para velocidade extrema e fidelidade visual.
+- **Build & Obfuscation**: Pipeline configurado para minificar e proteger de forma nativa regras proprietárias no build de distribuição estática (`dist/`).
+- **CI/CD Integrado**: GitHub Workflows prontos para Linting de código, validações SAST (Static Application Security Testing) e compilação limpa.
+
+---
+
+## 🚀 Como Executar Localmente
+
+### Variáveis de Ambiente (`.env`)
+Copie o arquivo de exemplo de ambiente corporativo e declare as credenciais de sua infraestrutura:
+```bash
+cp .env.example .env
 ```
+Defina sua chave de API para o motor de IA (`GEMINI_API_KEY`) para habilitar recursos analíticos de auditoria automática. O sistema está projetado para aceitar chaves em BYOK de forma segura e local (as chaves de API nunca são expostas ao browser ou ao console).
+
+### Executar em Desenvolvimento
+```bash
+npm run dev
+```
+Acesse a aplicação localmente no endereço padrão [http://localhost:3000](http://localhost:3000).
+
+### Compilar e Empacotar para Produção
+```bash
+npm run build
+```
+Os artefatos compilados e compactados são gerados no diretório `/dist` prontos para entrega estática de ultra alta velocidade por CDN (AWS CloudFront, Cloudflare, Fastly) ou containers empacotados.
 
 ---
 
-## 🚀 Configuração, Inicialização e Instalação
+## 📋 Roadmap do Repositório
 
-### Pré-requisitos
-*   Node.js v18.0.0 ou superior.
-*   NPM (gerenciador de pacotes padrão).
-
-### Instalação e Desenvolvimento Local
-
-1.  Clone este repositório de engenharia corporativa:
-    ```bash
-    git clone https://github.com/ana-caroline-lamas/bancada-prompt.git
-    cd bancada-prompt
-    ```
-
-2.  Instale as dependências estruturadas:
-    ```bash
-    npm install
-    ```
-
-3.  Configure as variáveis de ambiente baseadas no `.env.example`:
-    ```bash
-    cp .env.example .env
-    ```
-    *Preencha a variável `GEMINI_API_KEY` com suas credenciais de produção.*
-
-4.  Inicie o servidor de desenvolvimento local:
-    ```bash
-    npm run dev
-    ```
-    O console abrirá a aplicação em [http://localhost:3000](http://localhost:3000) de forma isolada.
-
-5.  Compilação e build de produção:
-    ```bash
-    npm run build
-    ```
-    A build estática é gerada na pasta `dist/` pronta para ser servida em instâncias de CDN de alto desempenho ou empacotada em containers AWS ECS/Fargate de forma imutável.
+- [x] Arquitetura desacoplada e Clean Architecture.
+- [x] Barramento resiliente de IA com Circuit Breaker e Fallback automático (403/429 mitigation).
+- [x] Simuladores de auditoria estática e laboratório ativo CWE-22.
+- [ ] Integração ativa com exportadores remotos em formato ZIP e API GitHub nativa.
+- [ ] Módulos adicionais para geração automatizada de diagramas de arquitetura estrutural em formato Mermaid.js.
 
 ---
 
-> **Aviso de Isenção de Responsabilidade (Disclaimer)**: Este software executa análise estática de código e simulações com o propósito de blindagem de infraestrutura corporativa e treinamento defensivo. O uso em auditorias de sistemas terceiros deve seguir estritamente as políticas éticas de divulgação responsável.
+## 📄 Licença & Governança
+
+Este projeto é disponibilizado sob a licença **MIT**. O código e os modelos de integração gerados operam de forma isolada e autônoma, livres de dependências externas proprietárias ou marcas d'água de editores de terceiros.
+
+---
+
+> **Aviso de Divulgação Responsável**: As ferramentas cognitivas integradas neste repositório têm fins estritamente defensivos, educativos e corporativos para validação contra falhas lógicas e estruturação ágil de novas aplicações limpas no GitHub.

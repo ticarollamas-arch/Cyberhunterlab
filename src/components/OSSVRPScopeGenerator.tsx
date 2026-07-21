@@ -137,11 +137,18 @@ function compileProto(userProvidedFlag) {
 };
 
 export function OSSVRPScopeGenerator() {
-  const { apiKey } = useApiKey();
+  const { apiKey, selectedModel } = useApiKey();
   const [selectedTemplate, setSelectedTemplate] = useState<string>(() => {
     const saved = localStorage.getItem('vrp_selected_template');
     return saved !== null ? saved : 'path-traversal-go';
   });
+
+  // Non-blocking custom alert/notification state
+  const [notification, setNotification] = useState<{ title: string; message: string; type: 'error' | 'warning' | 'info' } | null>(null);
+
+  const showAlert = (title: string, message: string, type: 'error' | 'warning' | 'info' = 'error') => {
+    setNotification({ title, message, type });
+  };
 
   // Unified State Suite (Parameters for Adaptive Narrative Engine)
   const [targetCompany, setTargetCompany] = useState<'google' | 'aws' | 'meta' | 'microsoft' | 'custom'>(() => {
@@ -1209,7 +1216,12 @@ ${patchCodeVal}
   // Cognitive Compressor parsing engine: converts messy chat logs / traces into exact config fields instantly!
   const handleCompressAndDeconstructRawLogs = async () => {
     if (!apiKey) {
-      alert("Chave de API do Gemini não configurada. Por favor, adicione sua chave de API para acionar a tradução heurística avançada por IA (BYOK).");
+      showAlert(
+        "Chave de API do Gemini Ausente",
+        "Matriz de Chave de API do Gemini não configurada. O painel de configuração de chaves de API foi aberto no topo da tela para que você insira sua chave (BYOK).",
+        "warning"
+      );
+      window.dispatchEvent(new CustomEvent('open-api-key-setup'));
       return;
     }
 
@@ -1239,14 +1251,33 @@ ${patchCodeVal}
       
       Seja fiel ao conteúdo de logs. Caso faltem informações, deduza logicamente de forma sênior baseando-se nas melhores práticas de segurança de 2026.`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: prompt,
-        config: {
-          temperature: 0.1,
-          responseMimeType: 'application/json'
+      const modelToUse = selectedModel || 'gemini-3.5-flash';
+      let response;
+      try {
+        response = await ai.models.generateContent({
+          model: modelToUse,
+          contents: prompt,
+          config: {
+            temperature: 0.1,
+            responseMimeType: 'application/json'
+          }
+        });
+      } catch (innerErr: any) {
+        console.warn(`Attempt with ${modelToUse} failed, testing fallback:`, innerErr);
+        const isPermissionError = innerErr.message?.includes("403") || innerErr.message?.includes("permission") || innerErr.message?.includes("PERMISSION_DENIED");
+        if (isPermissionError && modelToUse !== 'gemini-flash-latest') {
+          response = await ai.models.generateContent({
+            model: 'gemini-flash-latest',
+            contents: prompt,
+            config: {
+              temperature: 0.1,
+              responseMimeType: 'application/json'
+            }
+          });
+        } else {
+          throw innerErr;
         }
-      });
+      }
 
       if (response && response.text) {
         const parsed = JSON.parse(response.text);
@@ -1264,11 +1295,15 @@ ${patchCodeVal}
           `[PARSER] Sucesso: Tradutor Cognitivo extraiu logs com fidelidade! Campos atualizados.`,
           ...prev.slice(0, 4)
         ]);
-        alert("Desconstrução Concluída! Os campos e parâmetros do painel esquerdo foram atualizados de acordo com as informações estruturadas.");
+        showAlert(
+          "Deconstrução Concluída",
+          "Os campos e parâmetros do painel esquerdo foram atualizados de acordo com as informações estruturadas.",
+          "info"
+        );
       }
     } catch (e: any) {
       console.error(e);
-      alert(`Erro no compressor cognitivo do Gemini: ${e.message || e}`);
+      showAlert("Erro no Compressor Cognitivo", `Falha ao processar logs brutos usando o Gemini: ${e.message || e}`, "error");
     } finally {
       setIsAiGenerating(false);
     }
@@ -1277,7 +1312,12 @@ ${patchCodeVal}
   // Interactive AI synthesis of the OSS report using Google Gemini 2026 ruleset API
   const handleAiSynthesizeReport = async () => {
     if (!apiKey) {
-      alert("Matriz de Chave de API ausente. Por favor, adicione sua chave de API do Gemini no topo da tela para usar síntese heurística de IA.");
+      showAlert(
+        "Chave de API do Gemini Ausente",
+        "Matriz de Chave de API do Gemini ausente. O painel de configuração de chaves de API foi aberto no topo da tela para que você insira sua chave (BYOK).",
+        "warning"
+      );
+      window.dispatchEvent(new CustomEvent('open-api-key-setup'));
       return;
     }
 
@@ -1368,20 +1408,38 @@ ${patchCodeVal}
       PAYLOAD FINAL:
       ${pocPayload}`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: prompt,
-        config: {
-          temperature: 0.1
+      const modelToUse = selectedModel || 'gemini-3.5-flash';
+      let response;
+      try {
+        response = await ai.models.generateContent({
+          model: modelToUse,
+          contents: prompt,
+          config: {
+            temperature: 0.1
+          }
+        });
+      } catch (innerErr: any) {
+        console.warn(`Attempt with ${modelToUse} failed, testing fallback:`, innerErr);
+        const isPermissionError = innerErr.message?.includes("403") || innerErr.message?.includes("permission") || innerErr.message?.includes("PERMISSION_DENIED");
+        if (isPermissionError && modelToUse !== 'gemini-flash-latest') {
+          response = await ai.models.generateContent({
+            model: 'gemini-flash-latest',
+            contents: prompt,
+            config: {
+              temperature: 0.1
+            }
+          });
+        } else {
+          throw innerErr;
         }
-      });
+      }
       
       if (response && response.text) {
         setReportMarkdown(response.text);
       }
     } catch (e: any) {
       console.error(e);
-      alert(`Erro na orquestração com o agente Gemini: ${e.message || e}`);
+      showAlert("Erro de Orquestração Gemini", `Falha ao gerar o relatório final usando o Gemini: ${e.message || e}`, "error");
     } finally {
       setIsAiGenerating(false);
     }
@@ -1507,7 +1565,12 @@ ${patchCodeVal}
   // Deep interactive alignment audit using Google Gemini model orchestrator (BYOK)
   const handleAiAlignReportAudit = async () => {
     if (!apiKey) {
-      alert("Chave de API do Gemini ausente. Por favor, especifique sua chave antes de prosseguir com a auditoria lógica.");
+      showAlert(
+        "Chave de API do Gemini Ausente",
+        "Chave de API do Gemini ausente. O painel de configuração de chaves de API foi aberto no topo da tela para que você insira sua chave (BYOK) antes de prosseguir com a auditoria lógica.",
+        "warning"
+      );
+      window.dispatchEvent(new CustomEvent('open-api-key-setup'));
       return;
     }
 
@@ -1543,20 +1606,38 @@ ${patchCodeVal}
       ### 3. Blueprint Técnico de Incrementação ("Blindagem da Submissão")
       Forneça dicas e orientações práticas de como blindar o relatório. O que o hacker deve pesquisar no host local, que novos endpoints ligar, ou que quebras de barreira adicionar no escopo para obrigar a triagem a convalidar e pagar a premiação máxima.`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: prompt,
-        config: {
-          temperature: 0.2
+      const modelToUse = selectedModel || 'gemini-3.5-flash';
+      let response;
+      try {
+        response = await ai.models.generateContent({
+          model: modelToUse,
+          contents: prompt,
+          config: {
+            temperature: 0.2
+          }
+        });
+      } catch (innerErr: any) {
+        console.warn(`Attempt with ${modelToUse} failed, testing fallback:`, innerErr);
+        const isPermissionError = innerErr.message?.includes("403") || innerErr.message?.includes("permission") || innerErr.message?.includes("PERMISSION_DENIED");
+        if (isPermissionError && modelToUse !== 'gemini-flash-latest') {
+          response = await ai.models.generateContent({
+            model: 'gemini-flash-latest',
+            contents: prompt,
+            config: {
+              temperature: 0.2
+            }
+          });
+        } else {
+          throw innerErr;
         }
-      });
+      }
 
       if (response && response.text) {
         setAiAlignmentReview(response.text);
       }
     } catch (e: any) {
       console.error(e);
-      alert(`Falha na análise de auditoria com Gemini: ${e.message || e}`);
+      showAlert("Falha na Auditoria", `Erro na análise de auditoria de riscos com Gemini: ${e.message || e}`, "error");
     } finally {
       setIsAligningWithAi(false);
     }
@@ -2582,7 +2663,7 @@ ${patchCodeVal}
                           `[PARSER] Sucesso: Heurística local processou o rascunho.`,
                           ...prev.slice(0, 4)
                         ]);
-                        alert("Anatomização heurística rápida concluída!");
+                        showAlert("Anatomização Heurística", "Anatomização heurística rápida concluída com sucesso!", "info");
                       }}
                       className="flex-1 py-1.5 bg-zinc-905 border border-zinc-800 text-zinc-400 font-mono font-bold text-[8.5px] uppercase rounded-lg transition-all cursor-pointer hover:text-white"
                     >
@@ -2608,6 +2689,43 @@ ${patchCodeVal}
 
       </div>
 
+      {/* Non-blocking custom notification modal */}
+      {notification && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#121212] border border-zinc-800 rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3">
+              <div className={cn(
+                "p-2.5 rounded-lg border",
+                notification.type === 'error' ? "bg-red-500/10 border-red-500/30 text-red-400" :
+                notification.type === 'warning' ? "bg-amber-500/10 border-amber-500/30 text-amber-400" :
+                "bg-blue-500/10 border-blue-500/30 text-blue-400"
+              )}>
+                <AlertTriangle size={20} />
+              </div>
+              <div>
+                <h3 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
+                  {notification.title}
+                </h3>
+                <p className="text-[10px] font-mono text-zinc-500">NOTIFICAÇÃO SISTÊMICA</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-zinc-300 leading-relaxed font-sans">
+              {notification.message}
+            </p>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setNotification(null)}
+                className="px-4 py-2 bg-zinc-850 hover:bg-zinc-800 text-white rounded text-[10px] font-mono uppercase tracking-wider border border-zinc-800 cursor-pointer transition-colors"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

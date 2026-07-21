@@ -77,7 +77,7 @@ export interface VRPValidationResult {
 }
 
 export function ReverseArchEngine() {
-  const { apiKey } = useApiKey();
+  const { apiKey, selectedModel } = useApiKey();
   const [selectedSample, setSelectedSample] = useState<string>('google-vrp-lfi');
   
   // State inputs for Reverse Architecture Fingerprinting
@@ -128,6 +128,13 @@ export function ReverseArchEngine() {
   const [activeTab, setActiveTab] = useState<'inputs' | 'git' | 'flow' | 'audit'>('inputs');
   const [flowSubTab, setFlowSubTab] = useState<'diagram' | 'mermaid'>('diagram');
 
+  // Non-blocking custom alert/notification state
+  const [notification, setNotification] = useState<{ title: string; message: string; type: 'error' | 'warning' | 'info' } | null>(null);
+
+  const showAlert = (title: string, message: string, type: 'error' | 'warning' | 'info' = 'error') => {
+    setNotification({ title, message, type });
+  };
+
   const handleLoadSample = (sampleId: string) => {
     setSelectedSample(sampleId);
     const sample = SAMPLES.find(s => s.id === sampleId);
@@ -175,7 +182,7 @@ export function ReverseArchEngine() {
   // Scan architecture structure from public Git repository using the 4-Stage Intelligence Pipeline
   const handleScanRepository = async () => {
     if (!gitUrl) {
-      alert("Por favor, informe a URL do repositório Git.");
+      showAlert("URL do Repositório Ausente", "Por favor, informe a URL do repositório Git.", "warning");
       return;
     }
 
@@ -517,7 +524,12 @@ export function ReverseArchEngine() {
 
   const handleInferArchitecture = async () => {
     if (!apiKey) {
-      alert("Matriz de Chave de API ausente. Por favor, adicione sua chave de API do Gemini no topo da tela para usar a inferência de arquitetura inversa.");
+      showAlert(
+        "Chave de API do Gemini Ausente",
+        "Matriz de Chave de API do Gemini ausente. O painel de configuração de chaves de API foi aberto no topo da tela para que você insira sua chave.",
+        "warning"
+      );
+      window.dispatchEvent(new CustomEvent('open-api-key-setup'));
       return;
     }
 
@@ -586,20 +598,38 @@ export function ReverseArchEngine() {
       ### 🛠️ 5. Correção Arquitetural Canônica (O Patch Definitivo)
       [Mostre o trecho de código defensivo correspondente à linguagem deduzida que aniquila o bug permanentemente usando correspondência canônica estrutural com sanidade canônica absoluta].`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: prompt,
-        config: {
-          temperature: 0.15
+      let modelToUse = selectedModel || 'gemini-3.5-flash';
+      let response;
+      try {
+        response = await ai.models.generateContent({
+          model: modelToUse,
+          contents: prompt,
+          config: {
+            temperature: 0.15
+          }
+        });
+      } catch (innerErr: any) {
+        console.warn(`Attempt with ${modelToUse} failed, testing fallback:`, innerErr);
+        const isPermissionError = innerErr.message?.includes("403") || innerErr.message?.includes("permission") || innerErr.message?.includes("PERMISSION_DENIED");
+        if (isPermissionError && modelToUse !== 'gemini-flash-latest') {
+          response = await ai.models.generateContent({
+            model: 'gemini-flash-latest',
+            contents: prompt,
+            config: {
+              temperature: 0.15
+            }
+          });
+        } else {
+          throw innerErr;
         }
-      });
+      }
 
       if (response && response.text) {
         setInferredReport(response.text);
       }
     } catch (e: any) {
       console.error(e);
-      alert(`Falha ao orquestrar inferência reversa: ${e.message || e}`);
+      showAlert("Falha na Inferência", `Falha ao orquestrar inferência reversa: ${e.message || e}`, "error");
     } finally {
       setInferenceInProcess(false);
     }
@@ -1668,6 +1698,43 @@ A explotação bem-sucedida do Directory Traversal demonstrado comprova que o at
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* Non-blocking custom notification modal */}
+      {notification && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#121212] border border-zinc-800 rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3">
+              <div className={cn(
+                "p-2.5 rounded-lg border",
+                notification.type === 'error' ? "bg-red-500/10 border-red-500/30 text-red-400" :
+                notification.type === 'warning' ? "bg-amber-500/10 border-amber-500/30 text-amber-400" :
+                "bg-blue-500/10 border-blue-500/30 text-blue-400"
+              )}>
+                <AlertTriangle size={20} />
+              </div>
+              <div>
+                <h3 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
+                  {notification.title}
+                </h3>
+                <p className="text-[10px] font-mono text-zinc-500">NOTIFICAÇÃO SISTÊMICA</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-zinc-300 leading-relaxed font-sans">
+              {notification.message}
+            </p>
+
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setNotification(null)}
+                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-[10px] font-mono uppercase tracking-wider border border-zinc-700 cursor-pointer transition-colors"
+              >
+                Entendido
+              </button>
+            </div>
           </div>
         </div>
       )}
